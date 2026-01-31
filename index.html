@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>NEXTATION – Deadlines, Tasks & Priorities (On Track, Tight Deadline, Prioritize)</title>
+  <style>
+    :root {
+      /* NEXTATION WEBSITE — COLOUR SYSTEM (from your PDF) */
+      --bg-main: #02030b; /* Page background */
+      --bg-gradient: radial-gradient(circle at top, #1c1f3b 0%, #050716 45%, #02030b 100%);
+      /* Surfaces / Cards */
+      --card-bg: rgba(15, 18, 40, 0.92);        /* Lesson panels */
+      --card-soft-bg: rgba(18, 21, 50, 0.88);   /* Tab cards and navigation buttons */
+      /* Neon accents */
+      --accent-cyan: #4ef2ff;   /* Cyan highlight around edges */
+      --accent-pink: #ff2f92;   /* Magenta highlight for buttons */
+      --accent-green: #4dff9b;  /* Success / tab completed mark */
+      --accent-yello: #ffe25f;  /* Accent blended in text gradients */
+      --accent-purple: #aa5dff; /* Hover glows and edges */
+      /* Text and borders */
+      --muted: rgba(255,255,255,0.65);
+      --border-glow: rgba(120,120,255,0.45);
+      /* Shadows */
+      --shadow-strong: 0 0 36px rgba(130,80,255,0.6);
+      --shadow-soft: 0 0 20px rgba(0,0,0,0.65);
+      /* Radii and transitions */
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      --transition-fast: 0.18s ease-out;
+      --transition-med: 0.28s ease-out;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg-gradient);
+      color: #fff;
+      min-height: 100vh;
+      padding: 32px 24px; /* Increased padding for more overall space */
+      display: flex;
+      justify-content: center;
+      line-height: 1.8; /* Increased line height for better readability */
+    }
+    .app { max-width: 1100px; width: 100%; }
+
+    /* HEADER */
+    .neon-header {
+      position: relative;
+      padding: 22px 24px 18px;
+      border-radius: var(--radius-lg);
+      background: rgba(3, 5, 20, 0.9);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border-glow);
+      margin-bottom: 32px; /* Increased margin-bottom */
+      overflow: hidden;
+    }
+    .neon-header::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(90deg, #00f5ff, #ff2f92, #ffe25f, #4dff9b);
+      opacity: 0.5;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .header-main { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; } /* Increased gap and margin */
+    .teacher-orb {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 0%, #00fff0 35%, #ff2f92 70%, #02030b 100%);
+      box-shadow: 0 0 24px rgba(0, 255, 255, 0.7), 0 0 32px rgba(255, 0, 160, 0.55);
+      flex-shrink: 0;
+    }
+    .brand-title {
+      font-size: 1.45rem;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .lesson-title {
+      font-size: 0.95rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+    .header-description {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* TABS NAVIGATION */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 28px; /* Increased margin */
+    }
+    .tab-button {
+      background: var(--card-soft-bg);
+      color: var(--muted);
+      border: 1px solid rgba(120,120,255,0.2);
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .tab-button:hover {
+      background: rgba(28, 31, 60, 0.95);
+      color: #fff;
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px rgba(170, 93, 255, 0.4);
+    }
+    .tab-button.active {
+      background: var(--accent-pink);
+      color: #fff;
+      border-color: var(--accent-pink);
+      box-shadow: 0 0 18px var(--accent-pink);
+      font-weight: 700;
+    }
+
+    /* LESSON PANELS */
+    .panels {
+      display: grid;
+      gap: 24px; /* Increased gap between panels */
+    }
+    .panel {
+      display: none; /* Hidden by default */
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(120,120,255,0.3);
+      padding: 28px; /* Increased padding */
+    }
+    .panel.active {
+      display: block; /* Active panel is shown */
+    }
+
+    /* CARD INNER CONTENT */
+    .card-inner {
+      padding: 18px; /* Inner padding for distinction */
+      border-radius: var(--radius-md);
+      background: rgba(25, 28, 55, 0.7); /* Slightly lighter background for inner content */
+      border: 1px dashed rgba(120,120,255,0.2);
+      margin-bottom: 24px; /* Space between content blocks */
+    }
+
+    .section-title {
+      font-size: 1.6rem; /* Larger title */
+      color: var(--accent-cyan);
+      margin-bottom: 18px; /* More space below title */
+      text-align: center;
+      text-shadow: 0 0 8px rgba(78, 242, 255, 0.6);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .section-sub {
+      font-size: 1.1rem;
+      color: var(--accent-yello);
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .sub-title {
+      font-size: 1.3rem;
+      color: var(--accent-pink);
+      margin-top: 28px;
+      margin-bottom: 14px;
+      font-weight: 600;
+      border-bottom: 1px dashed rgba(255, 47, 146, 0.3);
+      padding-bottom: 8px;
+    }
+
+    .content-block {
+      margin-bottom: 22px; /* More space between general content blocks */
+      font-size: 1.05rem;
+    }
+    .content-block p {
+      margin-bottom: 12px; /* Space between paragraphs */
+    }
+
+    /* EXAMPLES */
+    .example-block {
+      background: rgba(30, 35, 70, 0.9);
+      border-left: 5px solid var(--accent-purple);
+      padding: 16px 20px;
+      margin: 20px 0; /* More vertical space for examples */
+      border-radius: var(--radius-sm);
+      box-shadow: 0 0 10px rgba(170, 93, 255, 0.2);
+    }
+    .example-en {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .example-pt {
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .example-explanation {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.75);
+      background: rgba(0,0,0,0.2);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(120,120,255,0.1);
+      margin-top: 10px;
+    }
+
+    /* MICRO-PRACTICE */
+    .micro-practice-section {
+      background: var(--card-soft-bg);
+      border: 1px solid var(--accent-green);
+      padding: 20px;
+      border-radius: var(--radius-md);
+      margin-top: 28px;
+      box-shadow: 0 0 15px rgba(77, 255, 155, 0.3);
+    }
+    .micro-practice-section h4 {
+      font-size: 1.15rem;
+      color: var(--accent-green);
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .practice-input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid rgba(77, 255, 155, 0.4);
+      border-radius: var(--radius-sm);
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-size: 1.05rem;
+      margin-top: 10px;
+      transition: border-color var(--transition-fast);
+    }
+    .practice-input:focus {
+      outline: none;
+      border-color: var(--accent-green);
+      box-shadow: 0 0 8px rgba(77, 255, 155, 0.6);
+    }
+    .char-counter {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 8px;
+    }
+    .feedback-message {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: var(--accent-yello);
+      text-align: center;
+    }
+
+    /* SUPER TIP */
+    .super-tip {
+      background: rgba(255, 226, 95, 0.15);
+      border-left: 5px solid var(--accent-yello);
+      padding: 18px;
+      margin: 25px 0;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      box-shadow: 0 0 12px rgba(255, 226, 95, 0.3);
+    }
+    .super-tip strong {
+      color: var(--accent-yello);
+      font-weight: 700;
+    }
+
+    /* PORTUGUESE THINKING */
+    .portuguese-thinking {
+      background: rgba(255, 47, 146, 0.15);
+      border-left: 5px solid var(--accent-pink);
+      padding: 18px;
+      margin: 25px 0;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      box-shadow: 0 0 12px rgba(255, 47, 146, 0.3);
+    }
+    .portuguese-thinking strong {
+      color: var(--accent-pink);
+      font-weight: 700;
+    }
+
+    /* PLAYBACK & RECORDING */
+    .controls-row {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 25px;
+      margin-bottom: 15px;
+    }
+    .playback-button, .record-button {
+      background: var(--accent-purple);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 15px rgba(170, 93, 255, 0.4);
+    }
+    .playback-button:hover, .record-button:hover {
+      background: #bb7eff;
+      box-shadow: 0 0 20px rgba(170, 93, 255, 0.6);
+    }
+    .record-button {
+      background: var(--accent-pink);
+      box-shadow: 0 0 15px rgba(255, 47, 146, 0.4);
+    }
+    .record-button:hover {
+      background: #ff5dae;
+      box-shadow: 0 0 20px rgba(255, 47, 146, 0.6);
+    }
+    .record-button.recording {
+      background: #ff2f92;
+      animation: pulse-red 1.5s infinite;
+    }
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(255, 47, 146, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 47, 146, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 47, 146, 0); }
+    }
+    .record-dot {
+      font-size: 1.2em;
+    }
+    #audio-status {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 10px;
+      padding-top: 5px;
+      border-top: 1px dashed rgba(255,255,255,0.1);
+    }
+
+    /* EXPORT BAR */
+    .export-bar {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(120,120,255,0.2);
+    }
+    .export-button {
+      background: var(--card-soft-bg);
+      color: var(--accent-cyan);
+      border: 1px solid var(--accent-cyan);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 10px rgba(78, 242, 255, 0.2);
+    }
+    .export-button:hover {
+      background: rgba(78, 242, 255, 0.1);
+      box-shadow: 0 0 15px rgba(78, 242, 255, 0.4);
+      color: #fff;
+    }
+
+    /* FOOTER */
+    .footer-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(120,120,255,0.2);
+    }
+    .footer-button {
+      background: var(--card-soft-bg);
+      color: var(--muted);
+      border: 1px solid rgba(120,120,255,0.2);
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .footer-button:hover {
+      background: rgba(28, 31, 60, 0.95);
+      color: #fff;
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 12px rgba(170, 93, 255, 0.4);
+    }
+    .footer-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .footer-meta {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* RESPONSIVENESS */
+    @media (max-width: 768px) {
+      body { padding: 20px 15px; }
+      .neon-header { padding: 18px 20px 15px; margin-bottom: 25px; }
+      .header-main { flex-direction: column; text-align: center; gap: 15px; margin-bottom: 10px; }
+      .brand-title { font-size: 1.2rem; }
+      .lesson-title { font-size: 0.85rem; }
+      .tabs { gap: 8px; margin-bottom: 20px; justify-content: center; }
+      .tab-button { padding: 8px 14px; font-size: 0.8rem; }
+      .panel { padding: 20px; }
+      .card-inner { padding: 15px; margin-bottom: 20px; }
+      .section-title { font-size: 1.4rem; margin-bottom: 15px; }
+      .section-sub { font-size: 1rem; margin-bottom: 12px; }
+      .sub-title { font-size: 1.1rem; margin-top: 22px; margin-bottom: 10px; }
+      .content-block { font-size: 1rem; margin-bottom: 18px; }
+      .example-en { font-size: 1.1rem; }
+      .example-pt { font-size: 0.95rem; }
+      .micro-practice-section { padding: 15px; margin-top: 22px; }
+      .micro-practice-section h4 { font-size: 1.05rem; margin-bottom: 12px; }
+      .practice-input { padding: 10px 12px; font-size: 1rem; }
+      .super-tip, .portuguese-thinking { padding: 15px; margin: 20px 0; font-size: 1rem; }
+      .controls-row { flex-direction: column; gap: 10px; margin-top: 20px; }
+      .playback-button, .record-button { padding: 8px 15px; font-size: 0.9rem; width: 100%; justify-content: center; }
+      .export-bar { flex-direction: column; gap: 10px; margin-top: 30px; }
+      .export-button { width: 100%; justify-content: center; }
+      .footer-nav { flex-direction: column; gap: 10px; margin-top: 30px; }
+      .footer-button { width: 100%; justify-content: center; }
+    }
+  </style>
+  <!-- For PDF export functionality -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="neon-header">
+      <div class="header-main">
+        <div class="teacher-orb"></div>
+        <div>
+          <h1 class="brand-title">NEXTATION</h1>
+          <p class="lesson-title">Inglês para Negócios: Prazos, Tarefas & Prioridades</p>
+        </div>
+      </div>
+      <p class="header-description">
+        Domine as frases essenciais para gerenciar projetos, comunicar prazos e definir prioridades no ambiente de trabalho. Prepare-se para ser mais eficiente e claro em suas comunicações profissionais! 🚀
+      </p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button active" onclick="showTab('overview')">🧠 Visão Geral</button>
+      <button class="tab-button" onclick="showTab('on-track')">📈 On Track</button>
+      <button class="tab-button" onclick="showTab('tight-deadline')">⏳ Tight Deadline</button>
+      <button class="tab-button" onclick="showTab('prioritize-task')">✅ Prioritize Task</button>
+      <button class="tab-button" onclick="showTab('reviewing-timeline')">📅 Reviewing Timeline</button>
+      <button class="tab-button" onclick="showTab('must-finish')">💪 Must Finish</button>
+      <button class="tab-button" onclick="showTab('practice-time')">✍️ Hora da Prática!</button>
+      <button class="tab-button" onclick="showTab('talk-it-out')">🗣️ Fale em Voz Alta!</button>
+    </nav>
+
+    <div class="panels">
+      <!-- Tab 1: Overview -->
+      <div id="overview" class="panel active">
+        <div class="card-inner">
+          <h2 class="section-title">Visão Geral: Prazos, Tarefas & Prioridades</h2>
+          <p class="section-sub">Comunique-se com clareza e eficiência no trabalho.</p>
+
+          <div class="content-block">
+            <p>No mundo corporativo, saber expressar status de projetos, urgências e compromissos é fundamental. Esta lição vai te equipar com as frases mais comuns e úteis para falar sobre <strong>prazos, tarefas e prioridades</strong> em inglês. Vamos desmistificar cada uma delas!</p>
+            <p>🚀 <strong>Nosso objetivo:</strong> Fazer você se sentir confiante para gerenciar suas comunicações de trabalho em inglês, evitando mal-entendidos e mostrando profissionalismo.</p>
+          </div>
+
+          <div class="super-tip">
+            <strong>💡 Dica NEXTATION:</strong> Pense nessas frases como ferramentas essenciais na sua caixa de ferramentas de trabalho. Quanto mais você as usar, mais natural elas se tornarão!
+          </div>
+
+          <h3 class="sub-title">Estruturas que vamos ver:</h3>
+          <ul>
+            <li><strong>Expressões Fixas:</strong> Frases que você usa "prontas".</li>
+            <li><strong>Collocations:</strong> Palavras que combinam naturalmente.</li>
+            <li><strong>Future Simple (Will):</strong> Para expressar decisões e compromissos.</li>
+            <li><strong>Present Continuous:</strong> Para ações em andamento.</li>
+            <li><strong>Modal Verbs (Must):</strong> Para obrigações fortes.</li>
+          </ul>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique Rápido: O que você priorizaria hoje?</h4>
+            <p>Escreva uma tarefa importante que você precisa fazer no trabalho hoje.</p>
+            <input type="text" class="practice-input" placeholder="Ex: I need to finish the report.">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: The project is on track. -->
+      <div id="on-track" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">📈 The project is on track.</h2>
+          <p class="section-sub">O projeto está no caminho certo.</p>
+
+          <div class="example-block">
+            <div class="example-en">
+              <button class="playback-button" onclick="speakText('The project is on track.')">🔊</button>
+              🧱 The project | is | on track.
+            </div>
+            <div class="example-pt">🇧🇷 O projeto está no caminho certo.</div>
+            <div class="example-explanation">
+              📘 "On track" é uma expressão fixa que significa que algo está progredindo conforme o planejado, sem atrasos. É super comum em relatórios de status de projetos.
+            </div>
+          </div>
+
+          <div class="portuguese-thinking">
+            <strong>🤔 Pensamento Brasileiro:</strong> Em português, diríamos "está no caminho certo" ou "está dentro do cronograma". Em inglês, "on track" encapsula bem essa ideia de progresso positivo.
+          </div>
+
+          <div class="content-block">
+            <p>Usamos "on track" para indicar que tudo está correndo como esperado e que as metas serão atingidas. É uma frase que transmite confiança e controle.</p>
+            <p><strong>Exemplo Adicional:</strong></p>
+            <div class="example-block">
+              <div class="example-en">
+                <button class="playback-button" onclick="speakText('Our team is on track to meet the quarterly goals.')">🔊</button>
+                ➡️ Our team is on track to meet the quarterly goals.
+              </div>
+              <div class="example-pt">🇧🇷 Nossa equipe está no caminho certo para atingir as metas trimestrais.</div>
+            </div>
+          </div>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique: Complete a frase</h4>
+            <p>A nova campanha de marketing _________ para ser lançada na próxima semana.</p>
+            <input type="text" class="practice-input" placeholder="Resposta: is on track">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: We have a tight deadline. -->
+      <div id="tight-deadline" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">⏳ We have a tight deadline.</h2>
+          <p class="section-sub">Temos um prazo apertado.</p>
+
+          <div class="example-block">
+            <div class="example-en">
+              <button class="playback-button" onclick="speakText('We have a tight deadline.')">🔊</button>
+              🧱 We | have | a tight deadline.
+            </div>
+            <div class="example-pt">🇧🇷 Temos um prazo apertado.</div>
+            <div class="example-explanation">
+              📘 "Tight deadline" é uma collocation muito comum em inglês para negócios, significando que o prazo é curto e há pouco tempo para completar a tarefa.
+            </div>
+          </div>
+
+          <div class="super-tip">
+            <strong>💡 Dica NEXTATION:</strong> A palavra "tight" (apertado) é usada em inglês para descrever algo que é restrito ou limitado, como um "tight schedule" (cronograma apertado) ou "tight budget" (orçamento apertado).
+          </div>
+
+          <div class="content-block">
+            <p>Essa frase é essencial para comunicar a urgência de uma tarefa ou projeto. É importante usá-la quando você precisa que a equipe entenda a necessidade de agilidade.</p>
+            <p><strong>Exemplo Adicional:</strong></p>
+            <div class="example-block">
+              <div class="example-en">
+                <button class="playback-button" onclick="speakText('The client gave us a very tight deadline for this delivery.')">🔊</button>
+                ➡️ The client gave us a very tight deadline for this delivery.
+              </div>
+              <div class="example-pt">🇧🇷 O cliente nos deu um prazo muito apertado para esta entrega.</div>
+            </div>
+          </div>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique: Construa a frase</h4>
+            <p>Crie uma frase dizendo que você tem um prazo apertado para um relatório.</p>
+            <input type="text" class="practice-input" placeholder="Ex: I have a tight deadline for the report.">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: I will prioritize this task. -->
+      <div id="prioritize-task" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">✅ I will prioritize this task.</h2>
+          <p class="section-sub">Vou priorizar esta tarefa.</p>
+
+          <div class="example-block">
+            <div class="example-en">
+              <button class="playback-button" onclick="speakText('I will prioritize this task.')">🔊</button>
+              🧱 I | will prioritize | this task.
+            </div>
+            <div class="example-pt">🇧🇷 Vou priorizar esta tarefa.</div>
+            <div class="example-explanation">
+              📘 Usamos "will" + o verbo na forma base para expressar uma decisão espontânea, uma promessa ou uma intenção que está sendo feita no momento da fala. "Prioritize" é um verbo chave em gestão de tempo.
+            </div>
+          </div>
+
+          <div class="portuguese-thinking">
+            <strong>🤔 Pensamento Brasileiro:</strong> Em português, "Vou priorizar" já indica o futuro. Em inglês, o "will" é essencial para mostrar essa intenção ou decisão imediata.
+          </div>
+
+          <div class="content-block">
+            <p>Essa frase é útil para comunicar a colegas ou superiores que você está ciente da importância de uma tarefa e que a colocará em primeiro lugar na sua lista de afazeres.</p>
+            <p><strong>Exemplo Adicional:</strong></p>
+            <div class="example-block">
+              <div class="example-en">
+                <button class="playback-button" onclick="speakText('Don\'t worry, I will prioritize sending you the documents.')">🔊</button>
+                ➡️ Don't worry, I will prioritize sending you the documents.
+              </div>
+              <div class="example-pt">🇧🇷 Não se preocupe, vou priorizar o envio dos documentos para você.</div>
+            </div>
+          </div>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique: O que você vai priorizar?</h4>
+            <p>Escreva uma frase sobre algo que você vai priorizar amanhã.</p>
+            <input type="text" class="practice-input" placeholder="Ex: I will prioritize preparing for the meeting.">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: They are reviewing the timeline. -->
+      <div id="reviewing-timeline" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">📅 They are reviewing the timeline.</h2>
+          <p class="section-sub">Eles estão revisando o cronograma.</p>
+
+          <div class="example-block">
+            <div class="example-en">
+              <button class="playback-button" onclick="speakText('They are reviewing the timeline.')">🔊</button>
+              🧱 They | are reviewing | the timeline.
+            </div>
+            <div class="example-pt">🇧🇷 Eles estão revisando o cronograma.</div>
+            <div class="example-explanation">
+              📘 "Are reviewing" usa o Present Continuous (verbo "to be" + verbo com -ing) para indicar uma ação que está acontecendo agora ou em um período atual. "Timeline" é o cronograma visual de um projeto.
+            </div>
+          </div>
+
+          <div class="super-tip">
+            <strong>💡 Dica NEXTATION:</strong> Cuidado para não confundir "timeline" com "schedule". "Timeline" geralmente se refere à sequência de eventos de um projeto, enquanto "schedule" pode ser um cronograma mais detalhado de tarefas ou compromissos pessoais.
+          </div>
+
+          <div class="content-block">
+            <p>Essa frase é perfeita para dar um update sobre o status de uma etapa do projeto, indicando que uma revisão está em andamento.</p>
+            <p><strong>Exemplo Adicional:</strong></p>
+            <div class="example-block">
+              <div class="example-en">
+                <button class="playback-button" onclick="speakText('The team is currently reviewing the timeline for the next phase.')">🔊</button>
+                ➡️ The team is currently reviewing the timeline for the next phase.
+              </div>
+              <div class="example-pt">🇧🇷 A equipe está atualmente revisando o cronograma para a próxima fase.</div>
+            </div>
+          </div>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique: O que está sendo revisado?</h4>
+            <p>Crie uma frase dizendo que a gerência está revisando as novas políticas.</p>
+            <input type="text" class="practice-input" placeholder="Ex: The management is reviewing the new policies.">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 6: We must finish today. -->
+      <div id="must-finish" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">💪 We must finish today.</h2>
+          <p class="section-sub">Precisamos finalizar hoje (obrigação).</p>
+
+          <div class="example-block">
+            <div class="example-en">
+              <button class="playback-button" onclick="speakText('We must finish today.')">🔊</button>
+              🧱 We | must | finish today.
+            </div>
+            <div class="example-pt">🇧🇷 Precisamos finalizar hoje (obrigação).</div>
+            <div class="example-explanation">
+              📘 "Must" é um modal verb que expressa uma obrigação forte, uma necessidade interna ou uma regra. É mais enfático que "should" (deveria) ou "have to" (ter que).
+            </div>
+          </div>
+
+          <div class="portuguese-thinking">
+            <strong>🤔 Pensamento Brasileiro:</strong> "Precisamos" em português pode ser traduzido por "need to" ou "must". "Must" carrega um peso maior de urgência e importância inadiável.
+          </div>
+
+          <div class="content-block">
+            <p>Use "must" quando não há alternativa e a ação é crucial. É uma forma direta de comunicar a importância de uma tarefa ser concluída.</p>
+            <p><strong>Exemplo Adicional:</strong></p>
+            <div class="example-block">
+              <div class="example-en">
+                <button class="playback-button" onclick="speakText('You must submit your report by 5 PM.')">🔊</button>
+                ➡️ You must submit your report by 5 PM.
+              </div>
+              <div class="example-pt">🇧🇷 Você deve enviar seu relatório até as 17h.</div>
+            </div>
+          </div>
+
+          <div class="micro-practice-section">
+            <h4>📝 Pratique: O que é uma obrigação?</h4>
+            <p>Crie uma frase sobre algo que você *precisa* (must) fazer antes de sair do trabalho.</p>
+            <input type="text" class="practice-input" placeholder="Ex: I must send this email before I leave.">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 7: Practice Time! -->
+      <div id="practice-time" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">✍️ Hora da Prática!</h2>
+          <p class="section-sub">Teste seus conhecimentos e fixe as frases.</p>
+
+          <div class="content-block">
+            <p>Agora é a sua vez de brilhar! Use as frases e estruturas que aprendemos para completar os exercícios abaixo. Não se preocupe em errar, o importante é praticar!</p>
+          </div>
+
+          <h3 class="sub-title">Exercício 1: Traduza as frases</h3>
+          <div class="exercise-section">
+            <p>1. O novo software está no caminho certo para ser lançado.</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta em inglês">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: The new software is on track to be launched.</em></p>
+          </div>
+          <div class="exercise-section">
+            <p>2. Temos um prazo muito apertado para esta apresentação.</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta em inglês">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: We have a very tight deadline for this presentation.</em></p>
+          </div>
+          <div class="exercise-section">
+            <p>3. Vou priorizar a ligação para o cliente.</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta em inglês">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: I will prioritize calling the client.</em></p>
+          </div>
+          <div class="exercise-section">
+            <p>4. A equipe está revisando os resultados do último trimestre.</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta em inglês">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: The team is reviewing last quarter's results.</em></p>
+          </div>
+          <div class="exercise-section">
+            <p>5. Você deve (obrigação) ler o manual antes de usar o equipamento.</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta em inglês">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: You must read the manual before using the equipment.</em></p>
+          </div>
+
+          <h3 class="sub-title">Exercício 2: Responda em inglês</h3>
+          <div class="exercise-section">
+            <p>1. How would you say that a new feature is progressing well?</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: The new feature is on track.</em></p>
+          </div>
+          <div class="exercise-section">
+            <p>2. What do you say when you have very little time to finish a task?</p>
+            <input type="text" class="practice-input" placeholder="Sua resposta">
+            <div class="char-counter">0/100 caracteres</div>
+            <div class="feedback-message"></div>
+            <p class="example-pt" style="margin-top: 10px;"><em>Resposta Sugerida: I have a tight deadline.</em></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 8: Talk it Out! -->
+      <div id="talk-it-out" class="panel">
+        <div class="card-inner">
+          <h2 class="section-title">🗣️ Fale em Voz Alta!</h2>
+          <p class="section-sub">Pratique a pronúncia e a fluência.</p>
+
+          <div class="content-block">
+            <p>A melhor forma de fixar o que você aprendeu é falando! Use o botão abaixo para marcar seu momento de prática. Não se preocupe em gravar, apenas use-o como um lembrete para falar as frases em voz alta.</p>
+            <p>Imagine que você está em uma reunião de trabalho e precisa usar essas frases. Crie cenários, responda a perguntas imaginárias e use as expressões com confiança.</p>
+          </div>
+
+          <div class="controls-row">
+            <button id="record-btn" class="record-button" onclick="togglePractice()">
+              <span id="record-dot">⏺️</span> <span id="record-text">Marcar momento de prática</span>
+            </button>
+            <button class="playback-button" onclick="resetPractice()">🔄 Resetar Prática</button>
+          </div>
+          <p id="audio-status">Nenhum áudio real é gravado – use o botão como compromisso de prática em voz alta. 🎧</p>
+
+          <div class="super-tip">
+            <strong>💡 Dica NEXTATION:</strong> Fale as frases em diferentes contextos. Por exemplo: "Is this project on track?" (pergunta), "Yes, it's definitely on track!" (resposta), "We need to get this project back on track." (problema).
+          </div>
+
+          <h3 class="sub-title">Cenários para Praticar:</h3>
+          <ul>
+            <li><strong>Status Report:</strong> Descreva o andamento de um projeto usando "on track" ou explicando por que algo tem um "tight deadline".</li>
+            <li><strong>Priorização:</strong> Explique para um colega por que você "will prioritize" uma tarefa específica.</li>
+            <li><strong>Reunião de Equipe:</strong> Diga que a equipe "is reviewing the timeline" ou que "we must finish today".</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer-nav">
+      <button class="footer-button" onclick="showPreviousTab()" disabled id="prev-tab-button">← Anterior</button>
+      <div class="export-bar">
+        <button class="export-button" onclick="copyToSpreadsheet()">📋 Copiar para Planilha</button>
+        <button class="export-button" onclick="exportPdf()">📄 Exportar para PDF</button>
+      </div>
+      <button class="footer-button" onclick="showNextTab()" id="next-tab-button">Próximo →</button>
+    </footer>
+    <div class="footer-meta">
+      NEXTATION © 2026 – All rights reserved.
+    </div>
+  </div>
+
+  <script>
+    let currentTabIndex = 0;
+    const tabs = document.querySelectorAll('.tab-button');
+    const panels = document.querySelectorAll('.panel');
+    const prevButton = document.getElementById('prev-tab-button');
+    const nextButton = document.getElementById('next-tab-button');
+    let recording = false; // State for the practice button
+
+    // --- Tab Navigation ---
+    function showTab(tabId) {
+      panels.forEach(panel => panel.classList.remove('active'));
+      tabs.forEach(tab => tab.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+      currentTabIndex = Array.from(tabs).findIndex(tab => tab.classList.contains('active'));
+      updateNavigationButtons();
+    }
+
+    function updateNavigationButtons() {
+      prevButton.disabled = currentTabIndex === 0;
+      nextButton.disabled = currentTabIndex === tabs.length - 1;
+    }
+
+    function showNextTab() {
+      if (currentTabIndex < tabs.length - 1) {
+        currentTabIndex++;
+        showTab(panels[currentTabIndex].id);
+      }
+    }
+
+    function showPreviousTab() {
+      if (currentTabIndex > 0) {
+        currentTabIndex--;
+        showTab(panels[currentTabIndex].id);
+      }
+    }
+
+    // --- Text-to-Speech ---
+    function speakText(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US'; // Set language to English
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // --- Practice Recording Toggle ---
+    function togglePractice(){
+      recording = !recording;
+      const btn = document.getElementById('record-btn');
+      const txt = document.getElementById('record-text');
+      const dot = document.getElementById('record-dot');
+      const status = document.getElementById('audio-status');
+      if(!btn || !txt || !dot || !status) return;
+
+      if(recording){
+        btn.classList.add('recording');
+        dot.textContent = '🔴';
+        txt.textContent = 'Praticando agora...';
+        status.innerHTML = 'Momento de prática: fale em voz alta suas frases de Business English. Use: <strong>on track, tight deadline, will prioritize, reviewing the timeline, must finish</strong> e outros que você criar! 🎧';
+      }else{
+        btn.classList.remove('recording');
+        dot.textContent = '⏺️';
+        txt.textContent = 'Marcar momento de prática';
+        status.textContent = 'Prática pausada. Clique de novo quando quiser focar na fala.';
+      }
+    }
+
+    function resetPractice(){
+      recording = false;
+      const btn = document.getElementById('record-btn');
+      const txt = document.getElementById('record-text');
+      const dot = document.getElementById('record-dot');
+      const status = document.getElementById('audio-status');
+      if(!btn || !txt || !dot || !status) return;
+
+      btn.classList.remove('recording');
+      dot.textContent = '⏺️';
+      txt.textContent = 'Marcar momento de prática';
+      status.innerHTML = 'Nenhum áudio real é gravado – use o botão como compromisso de prática em voz alta. 🎧';
+    }
+
+    // --- Copy to Spreadsheet ---
+    function copyToSpreadsheet(){
+      const text = collectLessonText();
+      if(!navigator.clipboard){
+        alert('Seu navegador não permite cópia automática. Selecione o texto manualmente.');
+        return;
+      }
+      navigator.clipboard.writeText(text).then(()=>{
+        alert('Conteúdo copiado! Cole (Ctrl+V) na sua planilha.');
+      }).catch(()=>{
+        alert('Não foi possível copiar automaticamente. Selecione e copie manualmente.');
+      });
+    }
+
+    function collectLessonText(){
+      const blocks = [];
+      document.querySelectorAll('.card-inner').forEach(inner=>{
+        const clone = inner.cloneNode(true);
+        // Remove interactive elements and non-content parts from the cloned content
+        clone.querySelectorAll('button, input, textarea, select, label, .micro-practice-section, .super-tip, .char-counter, .feedback-message, .controls-row, .export-bar, .footer-nav, .footer-meta, .neon-header, .tabs, .app, .block-container ul, .example-en, .example-pt, .section-sub, .section-title, .sub-title, .exercise-section, .diagram-container, .syllable-counter-section, .adjective-example, .mistake-item, .tip-box, .portuguese-thinking').forEach(el=>el.remove());
+        // Clean up extra spaces/newlines
+        let cleanedText = clone.innerText.trim();
+        cleanedText = cleanedText.replace(/\s{2,}/g, ' '); // Replace multiple spaces with single space
+        cleanedText = cleanedText.replace(/\n\s*\n/g, '\n\n'); // Replace multiple newlines with double newline
+        blocks.push(cleanedText);
+      });
+      return blocks.join('\n\n-----------------------------\n\n');
+    }
+
+    // --- Export to PDF ---
+    async function exportPdf() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4'); // 'p' for portrait, 'pt' for points, 'a4' for A4 size
+
+        const content = document.querySelector('.panels'); // Select the main content area
+
+        // Temporarily show all panels to capture content for PDF
+        const allPanels = document.querySelectorAll('.panel');
+        allPanels.forEach(panel => panel.style.display = 'block');
+
+        // Capture content with html2canvas
+        const canvas = await html2canvas(content, {
+            scale: 2, // Increase scale for better resolution
+            useCORS: true, // Enable cross-origin images if any
+            windowWidth: content.scrollWidth,
+            windowHeight: content.scrollHeight,
+            x: content.offsetLeft,
+            y: content.offsetTop,
+            width: content.offsetWidth,
+            height: content.offsetHeight
+        });
+
+        // Restore original panel display
+        allPanels.forEach(panel => panel.style.display = 'none');
+        document.querySelector('.panel.active').style.display = 'block'; // Show only the active panel again
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 595; // A4 width in points
+        const pageHeight = 842; // A4 height in points
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+
+        let position = 0;
+
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        doc.save('NEXTATION_Lesson_Deadlines_Tasks_Priorities.pdf');
+    }
+
+    // Initial tab display on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      showTab('overview');
+    });
+  </script>
+</body>
+</html>
